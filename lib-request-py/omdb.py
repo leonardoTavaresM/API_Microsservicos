@@ -70,6 +70,7 @@ eu estou retornando o dicionário inteiro.
 '''
 
 
+print('aaaa')
 def busca_por_id(film_id):
     url = f"http://www.omdbapi.com/?apikey={api_key}&i={film_id}"
     pedido = requests.get(url)
@@ -153,8 +154,7 @@ um filme e retorna o seu nome.
 
 def nome_do_filme_por_id(id_filme):
     url = f"http://www.omdbapi.com/?apikey={api_key}&i={id_filme}&type=movie"
-    pedido = requests.get(url)  # conectar na URL
-    # transformo a string que eu recebi num dicionário de python
+    pedido = requests.get(url)
     dicionario_do_pedido = pedido.json()
     return dicionario_do_pedido['Title']
 
@@ -216,8 +216,17 @@ um dicionário. cada dicionario deve conter os campos
 '''
 
 
-def busca_filmes(texto_buscar):
-    pass  # implemente!
+def busca_filmes(texto_buscar,pagina=1):
+    url = f"http://www.omdbapi.com/?apikey={api_key}&s={texto_buscar}&page={pagina}"
+    pedido = requests.get(url)
+    dicionario_do_pedido = pedido.json()
+    resposta = []
+    for filme in dicionario_do_pedido['Search']:
+        dic = {}
+        dic['nome'] = filme['Title']
+        dic['ano']  = filme['Year']
+        resposta.append(dic)
+    return resposta
 
 
 '''
@@ -226,5 +235,15 @@ os VINTE primeiros filmes que batem com a busca.
 '''
 
 
+
 def busca_filmes_grande(texto_buscar):
-    pass  # implemente!
+    pagina1 = busca_filmes(texto_buscar,1)
+    pagina2 = busca_filmes(texto_buscar,2)
+
+    return pagina1+pagina2
+
+    # url = f"http://www.omdbapi.com/?apikey={api_key}&i={id_filme}&type=movie"
+    # pedido = requests.get(url)  # conectar na URL
+    # # transformo a string que eu recebi num dicionário de python
+    # dicionario_do_pedido = pedido.json()
+    # return dicionario_do_pedido['Title']
