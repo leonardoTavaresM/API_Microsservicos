@@ -166,11 +166,8 @@ um filme e retorna o seu ano de lançamento.
 
 
 def ano_do_filme_por_id(id_filme):
-    url = f"http://www.omdbapi.com/?apikey={api_key}&i={id_filme}&type=movie"
-    pedido = requests.get(url)  # conectar na URL
-    # transformo a string que eu recebi num dicionário de python
-    dicionario_do_pedido = pedido.json()
-    return dicionario_do_pedido['Year']
+    json = busca_por_id(id_filme)
+    return json['Year']
 
 
 '''
@@ -190,18 +187,18 @@ E os dados devem ser preenchidos baseado nos dados do site.
 
 
 def dicionario_do_filme_por_id(id_filme):
-    url = f"http://www.omdbapi.com/?apikey={api_key}&i={id_filme}&type=movie"
-    pedido = requests.get(url)  # conectar na URL
-    # transformo a string que eu recebi num dicionário de python
-    dicionario_do_pedido = pedido.json()
+    json = busca_por_id(id_filme)
     dicionario = {
-        "ano": dicionario_do_pedido['Year'],
-        "nome": dicionario_do_pedido['Title'],
-        "diretor": dicionario_do_pedido['Director'],
-        "genero": dicionario_do_pedido['Genre']
+        "ano": json['Year'],
+        "nome": json['Title'],
+        "diretor": json['Director'],
+        "genero": json['Genre']
     }
+    
     return dicionario
 
+
+print('aaa',dicionario_do_filme_por_id('tt0076759'))
 
 '''
 Voltando para a busca...
@@ -229,6 +226,8 @@ def busca_filmes(texto_buscar,pagina=1):
     return resposta
 
 
+
+pprint(busca_filmes('Star Wars'))
 '''
 Faça uma função busca_filmes_grande que, dada uma busca, retorna
 os VINTE primeiros filmes que batem com a busca.
