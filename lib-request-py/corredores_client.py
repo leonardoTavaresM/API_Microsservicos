@@ -1,5 +1,4 @@
 import requests
-from pprint import pprint 
 
 
 # faça uma função usando a biblioteca requests
@@ -8,46 +7,41 @@ from pprint import pprint
 
 
 def todos_corredores():
-  url = 'http://localhost:5000/corredores'
-  #conectar na URL usando o verbo GET
-  response = requests.get(url)
-  json = response.json()
+  url = "http://127.0.0.1:5000/corredores"
+  r = requests.get(url)
+  json = r.json()
   return json
 
+# faça uma função usando a lib request
+# que acessa a URL / corredores do servidor de corredores
+# via Post, enviando um dicionario de uym novo corredor
+# Um corredor tem campos "nome", "tempo" e "id"
 
+def adiciona_corredor(nome, tempo, id):
+  url = "http://127.0.0.1:5000/corredores"
 
-# faça uma função usando a biblioteca requests
-# que acessa a URL /corredores do servidor de corredoes
-# via POST, enviando um dicionário de um novo corredor.
-# Um corredor tem os campos "nome", "tempo" e "id"
+  body = {
+    "id" : id,
+    "nome" : nome,
+    "tempo" : tempo
+  }
 
-def adiciona_corredores(nome, tempo, id):
-  url = 'http://localhost:5000/corredores'
-  body = { "nome": nome, "tempo": tempo, "id": id }
-  r = requests.post(url, json = body)
-  print('response', r.Response)
-  if r:
-    return True
-  else:
-    return False
+  r = requests.post(url, json = body )
+  if r: 
+    return { "res": True, "corredor": body}
   
+  return False
 
-
-
-# faça uma função usando a biblioteca requests
+# faça uma função usando a lib requests
 # que acessa a URL /corredores/maior_tempo do servidor
-# de corredoes
-# via GET, e retorne o nome do corredor
-# mais lento
+# de todos_corredores via GET, e retorne o nome do corredor mais lento
 
 def corredor_mais_lento():
-  url = 'http://localhost:5000/corredores/maior_tempo'
-  #conectar na URL usando o verbo GET
-  response = requests.get(url)
-  json = response.json()
-  return json["nome"]
-  
-
+  url = "http://127.0.0.1:5000/corredores/maior_tempo"
+  r = requests.get(url)
+  json = r.json()
+  nome = json["nome"]
+  return nome
 
 # faça uma função usando a biblioteca requests
 # que acessa a URL /corredores/maior_tempo do servidor
@@ -58,11 +52,11 @@ def corredor_mais_lento():
 # de corredores está vazia, mas vamos tratar esse bug
 # no nosso cliente
 
-def deleta_corredor_mais_lento():
-  url = 'http://localhost:5000/corredores/maior_tempo'
-  #conectar na URL usando o verbo GET
-  r = requests.delete(url)
 
+def deleta_mais_lento():
+  url = "http://127.0.0.1:5000/corredores/maior_tempo"
+  r = requests.delete(url)
+  
   if r.status_code == 500:
     return "Não é possivel remover de uma lista vazia"
   
@@ -71,7 +65,9 @@ def deleta_corredor_mais_lento():
 # porque a funcionalidade anterior consiste em um erro
 # de design no servidor corredores?
 
-# a função DELETE devia ser IDENPOTENTE
+# R: o verbo Delete devia ser iDEMPOTENTE
+# deveria ser o caso que a segunda chamada nao causa novo efeito colateral
+# IDEMPOTENTE significa que, quando eu chamo a primeira vez, ele deleta, na segunda, não
 
 
 # faça uma função usando a biblioteca requests
@@ -81,21 +77,22 @@ def deleta_corredor_mais_lento():
 # sua função deve retornar o nome do corredor em questão
 # o o seu melhor tempo, em uma tupla
 
+def busca_corredor(id):
+  url = f"http://127.0.0.1:5000/corredores/{id}"
 
-def corredor_por_id(id):
-  url = f"http://localhost:5000/corredores/{id}"
   r = requests.get(url)
-  json = r.json()
   if r.status_code == 404:
     return "corredor nao existe"
-  nome = json['corredor']['nome']
-  tempo = json['corredor']['tempo']
-  
+  json = r.json()
+
+  nome = json["corredor"]["nome"]
+  tempo = json["corredor"]["tempo"]
+
   return (nome, tempo)
 
-
-
 #como eu trataria o erro 404 e informaria o meu usuário?
+
+# R: eu puxo o status da resposta, e se for 404, eu retorno ao usuario uma mensagem de erro
 
 
 # faça uma função usando a biblioteca requests
@@ -105,14 +102,15 @@ def corredor_por_id(id):
 # causando a remoção dos dados do corredor
 # mais lento
 
-def deleta_mais_lento_por_id(id):
-  url = f"http://localhost:5000/corredores/{id}"
-  r = requests.get(url)
- 
-  if r.status_code == 404:
-    return "corredor nao existe"
 
-  return True
+def deleta_mais_lento_por_id(id):
+  url = f"http://127.0.0.1:5000/corredores/{id}"
+
+  r = requests.delete(url)
+  if r.status_code == 404:
+    return r.json()['status']
+  
+  return "ok"
 
 # faça uma função usando a biblioteca requests
 # que acessa a URL /corredores/ID do servidor
@@ -124,15 +122,13 @@ def deleta_mais_lento_por_id(id):
 # do que o tempo atual, caso contrário, o servidor
 # lançará um erro, que você deve tratar
 
+def atualiza_corredor(id, tempo):
+  url = f"http://127.0.0.1:5000/corredores/{id}"
 
-def adiciona_corredores(id, tempo):
-  url = f'http://localhost:5000/corredores/{id}'
-  body = { "tempo": tempo,  }
-  r = requests.post(url, json = body)
-  print('response', r.Response)
+  r = requests.put(url, json = {"tempo": tempo })
   if r.status_code == 400:
-    return 'Tempo de envio é maior do que o tempo atual'
+    return r.json()['status']
   if r.status_code == 404:
-    return 'Corredor não encontrado'
-  return 'ok'
+    return r.json()['status']
   
+  return "ok"
